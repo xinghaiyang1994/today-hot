@@ -2,6 +2,8 @@
 const superagent = require('superagent')
 const cheerio = require('cheerio')
 const log = require('./log')
+const email  = require('./email')
+
 const {
   findChannelAll,
   findChannelDetailById
@@ -80,6 +82,10 @@ function fetchHotList(info) {
   })
   .catch(err => {
     log.logToFile('crawler.log', `${name}|${(new Date()).toLocaleString()}|${err.message}`)
+    email.send({
+      subject: '爬虫抓取失败',
+      html: `${name}|${(new Date()).toLocaleString()}|${err.message}`
+    })
   })
 }
 
