@@ -1,0 +1,17 @@
+<%- include('./components/header') %>
+
+    <div><%= status %></div>
+    <% if (env == 'development') { %>
+        <ul>
+            <li>
+                <div>错误信息：</div>
+                <div><%= error %></div>
+            </li>
+            <li>
+                <div>栈：</div>
+                <div><%= stack %></div>
+            </li>
+        </ul>
+    <% } %>
+
+<%- include('./components/footer') %>

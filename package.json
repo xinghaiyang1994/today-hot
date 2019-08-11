@@ -1,0 +1,46 @@
+{
+  "name": "sea-koa",
+  "version": "1.0.0",
+  "description": "some koa",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cross-env env=local nodemon index.js",
+    "prod": "cross-env env=prod pm2 start index.js --name='fish'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xinghaiyang1994/sea-koa.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xinghaiyang1994/sea-koa/issues"
+  },
+  "homepage": "https://github.com/xinghaiyang1994/sea-koa#readme",
+  "dependencies": {
+    "bookshelf": "^0.15.1",
+    "bookshelf-camelcase": "^2.0.1",
+    "cheerio": "^1.0.0-rc.3",
+    "ejs": "^2.6.1",
+    "knex": "^0.19.1",
+    "koa": "^2.5.2",
+    "koa-bodyparser": "^4.2.1",
+    "koa-helmet": "^4.0.0",
+    "koa-mysql-session": "^0.0.2",
+    "koa-router": "^7.4.0",
+    "koa-session-minimal": "^3.0.4",
+    "koa-static-cache": "^5.1.2",
+    "koa-views": "^6.1.4",
+    "koa2-cors": "^2.0.6",
+    "log4js": "^3.0.5",
+    "md5": "^2.2.1",
+    "moment": "^2.22.2",
+    "mysql": "^2.16.0",
+    "node-schedule": "^1.3.2",
+    "superagent": "^5.1.0",
+    "svg-captcha": "^1.3.11"
+  },
+  "devDependencies": {
+    "cross-env": "^5.2.0"
+  }
+}

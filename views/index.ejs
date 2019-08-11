@@ -1,0 +1,29 @@
+<%- include('./components/header') %>
+
+  <div class="wrap">
+    <div class="header clearfix">
+      <% for (let i = 0; i < navList.length; i ++) { %>
+        <% if (navList[i].id == channelId) { %> 
+          <a href="/?channelId=<%= navList[i].id %>" class="header-ls header-ls-act fl">
+        <% } else { %> 
+          <a href="/?channelId=<%= navList[i].id %>" class="header-ls fl">
+        <% } %> 
+          <%= navList[i].name %>
+        </a>
+      <% } %>
+    </div>
+    <div class="main">
+      <% for (let i = 0; i < list.length; i ++) { %>
+        <a href="<%= list[i].url %>" class="main-ls clearfix" target="_blanck">
+          <span class="main-ls-index fl">
+            <%= i + 1 %>
+          </span>
+          <span class="main-ls-title fl">
+            <%= list[i].title %>
+          </span>
+        </a>
+      <% } %>
+    </div>
+  </div>
+
+<%- include('./components/footer') %>

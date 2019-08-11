@@ -1,0 +1,21 @@
+@charset "utf-8";
+/*清除默认样式*/
+*{margin:0; padding:0;}
+img{vertical-align:top;border:none;}
+a{text-decoration:none;color:#000;}
+li{list-style:none;}
+html{-webkit-tap-highlight-color: transparent;}
+
+body{font:16px 'Microsoft yahei';}
+em,i{font-style:normal;}
+h1,h2,h3,h4,h5,h6{font-weight:normal;}
+
+/*常用*/
+.fl{float:left;}
+.fr{float:right;}
+.clearfix{zoom: 1;}
+.clearfix::after{content:'';display:block;clear:both;}
+.wrap-b{width:100%;min-width:1200px;overflow:hidden;}
+.wrap{width:1200px;margin:0 auto;}
+.all-w{width:100%}
+.all-wb{width:100%;display:block;}
