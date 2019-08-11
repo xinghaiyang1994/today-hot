@@ -53,10 +53,14 @@ function fetchHotList(info) {
   
   request.then(res => {
     let $ = cheerio.load(res.text)
+    console.log(9090)
     let list = []
+    console.log(111, listDom)
+
     if ($(listDom).length === 0) {
       throw new Error('未抓取数据！')
     }
+
     $(listDom).each((index, el) => {
       let titleDom = titleDomHasChildren ? $(el).find(listTitleDom) : $(el) 
       let urlDom = urlDomHasChildren ? $(el).find(listUrlDom) : $(el) 
@@ -103,7 +107,7 @@ module.exports = {
     let detail = resDetail.toJSON()
 
     // 删除单个渠道下的所有列表
-    await deleteListByChannelId(channelId)
+    // await deleteListByChannelId(channelId)
     
     // 抓取插入新列表
     fetchHotList(detail)
