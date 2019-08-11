@@ -113,7 +113,7 @@ module.exports = {
     let detail = resDetail.toJSON()
 
     // 删除单个渠道下的所有列表
-    // await deleteListByChannelId(channelId)
+    await deleteListByChannelId(channelId)
     
     // 抓取插入新列表
     fetchHotList(detail)

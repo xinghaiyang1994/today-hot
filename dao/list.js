@@ -16,6 +16,6 @@ module.exports = {
   },
   // 删除单个渠道下的所有列表
   deleteListByChannelId(channelId) {
-    return List.forge().where({'channel_id': channelId}).destroy().catch(console.log)
+    return List.forge().where({'channel_id': channelId}).destroy({require: false})
   }
 }
