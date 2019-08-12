@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "DEBUG=crawler cross-env env=local nodemon index.js",
-    "prod": "cross-env env=prod pm2 start index.js --name='fish'"
+    "prod": "cross-env env=prod pm2 start index.js --name='fish'",
+    "delete": "pm2 delete fish"
   },
   "repository": {
     "type": "git",
