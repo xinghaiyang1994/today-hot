@@ -2,7 +2,7 @@ const config = require('../config/default')
 
 const knex = require('knex')({
   client: 'mysql',
-  debug: config.ENV === 'local',
+  debug: config.mysqlDebug,
   connection: config.database,
   pool: { min: 10, max: 30 }
 })
