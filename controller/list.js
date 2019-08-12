@@ -3,20 +3,21 @@ const crawler = require('../common/crawler')
 
 module.exports = {
   async refreshListAll(ctx) {
-    await crawler.fetchAllData()
+    let res = crawler.fetchAllData()
     ctx.body = tools.dealBody({
-      code: 0,
+      code: res ? 0 : -1,
       data: {},
-      message: ''
+      message: res ? '抓取成功' : '抓取失败！'
     })
   },
   async refreshSingle(ctx) {
     const { channelId } = ctx.query
-    await crawler.fetchSingleData(channelId)
+    let res = crawler.fetchSingleData(channelId)
+    
     ctx.body = tools.dealBody({
-      code: 0,
+      code: res ? 0 : -1,
       data: {},
-      message: ''
+      message: res ? '抓取成功' : '抓取失败！'
     })
   }
 }

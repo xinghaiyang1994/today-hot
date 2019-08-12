@@ -3,6 +3,8 @@ const superagent = require('superagent')
 const cheerio = require('cheerio')
 const log = require('./log')
 const email  = require('./email')
+const debug = require('debug')
+const logCrawler = debug('crawler')
 
 const {
   findChannelAll,
@@ -33,7 +35,8 @@ function renderUrl(listUrlRule, info) {
 }
 
 // 抓取单个页面中的列表
-function fetchHotList(info) {
+async function fetchHotList(info) {
+  let result
   const { 
     id,
     name,
@@ -47,22 +50,23 @@ function fetchHotList(info) {
   } = info
   let titleDomHasChildren = listTitleDom !== ''
   let urlDomHasChildren = listUrlDom !== ''
-
-  let request = superagent.get(domain + hotUrl)
-  if (cookie !== ''){
-    request = request.set('cookie', cookie)
-  }
   
-  request.then(res => {
+  try {
+    let res 
+    if (cookie === ''){
+      // 不携带 cookie
+      res = await superagent.get(domain + hotUrl)
+    } else {
+      // 携带 cookie
+      res = await superagent.get(domain + hotUrl).set('cookie', cookie)
+    }
+
     let $ = cheerio.load(res.text)
-    console.log(9090)
     let list = []
-    console.log(111, listDom)
 
     if ($(listDom).length === 0) {
       throw new Error('未抓取数据！')
     }
-
     $(listDom).each((index, el) => {
       let titleDom = titleDomHasChildren ? $(el).find(listTitleDom) : $(el) 
       let urlDom = urlDomHasChildren ? $(el).find(listUrlDom) : $(el) 
@@ -70,7 +74,7 @@ function fetchHotList(info) {
       list.push({
         channelId: id,
         sort: index,
-        title: titleDom.text(),
+        title: titleDom.text().replace(/\s/g, ''),
         url: renderUrl(listUrlRule, {
           domain,
           listUrlDom: urlDom.attr('href')
@@ -78,31 +82,35 @@ function fetchHotList(info) {
       })
     })
     // console.log(list)
-    insertList(list)
-  })
-  .catch(err => {
+    result = await insertList(list)
+  } catch (err) {
     log.logToFile('crawler.log', `${name}|${(new Date()).toLocaleString()}|${err.message}`)
     email.send({
       subject: '爬虫抓取失败',
       html: `${name}|${(new Date()).toLocaleString()}|${err.message}`
     })
-  })
+  }
+  // logCrawler('res', result.length)
+  return (Object.assign([], result)).length > 0
 }
 
 module.exports = {
   // 抓取数据
   async fetchAllData() {
-    let res = await findChannelAll()
-    let list = res.toJSON()
+    let res = true
+    let result = await findChannelAll()
+    let list = result.toJSON()
 
     // 删除所有列表
     await deleteListAll()
-
+    
     // 遍历抓取插入列表
     list.forEach(el => {
-      fetchHotList(el)
+      if (!fetchHotList(el)) {
+        res = false
+      }
     })
-    return list
+    return res
   },
   async fetchSingleData(channelId) {
     // 获取单个渠道详情
@@ -116,6 +124,6 @@ module.exports = {
     await deleteListByChannelId(channelId)
     
     // 抓取插入新列表
-    fetchHotList(detail)
+    return fetchHotList(detail)
   }
 }
