@@ -3,6 +3,7 @@ const superagent = require('superagent')
 const cheerio = require('cheerio')
 const log = require('./log')
 const email  = require('./email')
+const specialChannelMethod = require('./special_channel_method')
 const debug = require('debug')
 const logCrawler = debug('crawler')
 
@@ -43,6 +44,7 @@ async function fetchHotList(info) {
     domain,
     hotUrl,
     cookie,
+    listSpecialMethod,
     listDom,
     listTitleDom,
     listUrlDom,
@@ -62,26 +64,41 @@ async function fetchHotList(info) {
     }
 
     let $ = cheerio.load(res.text)
-    let list = []
+    let originList = []
 
-    if ($(listDom).length === 0) {
-      throw new Error('未抓取数据！')
-    }
-    $(listDom).each((index, el) => {
-      let titleDom = titleDomHasChildren ? $(el).find(listTitleDom) : $(el) 
-      let urlDom = urlDomHasChildren ? $(el).find(listUrlDom) : $(el) 
-
-      list.push({
-        channelId: id,
-        sort: index,
-        title: titleDom.text().replace(/\s/g, ''),
-        url: renderUrl(listUrlRule, {
-          domain,
-          listUrlDom: urlDom.attr('href')
+    if (listSpecialMethod !== '') {
+      // 按特殊方法获取列表
+      originList = specialChannelMethod[listSpecialMethod]($, info)
+    } else {
+      // 按常规
+      $(listDom).each((index, el) => {
+        let titleDom = titleDomHasChildren ? $(el).find(listTitleDom) : $(el) 
+        let urlDom = urlDomHasChildren ? $(el).find(listUrlDom) : $(el) 
+  
+        originList.push({
+          title: titleDom.text().replace(/\s/g, ''),
+          domOriginUrl: urlDom.attr('href')
         })
       })
+    }
+
+    if (originList.length === 0) {
+      throw new Error('未抓取数据！')
+    }
+    let list = originList.map(({ title, domOriginUrl }, index) => {
+      return {
+        channelId: id,
+        sort: index,
+        title,
+        url: renderUrl(listUrlRule, {
+          domain,
+          listUrlDom: domOriginUrl
+        })
+      }
     })
-    // console.log(list)
+
+    // return logCrawler(list)
+
     result = await insertList(list)
   } catch (err) {
     log.logToFile('crawler.log', `${name}|${(new Date()).toLocaleString()}|${err.message}`)
