@@ -46,6 +46,7 @@ async function fetchHotList(info) {
     domain,
     hotUrl,
     cookie,
+    useUserAgent,
     listSpecialMethod,
     listDom,
     listTitleDom,
@@ -56,20 +57,32 @@ async function fetchHotList(info) {
   let titleDomHasChildren = listTitleDom !== ''
   let urlDomHasChildren = listUrlDom !== ''
   
-  // logCrawler(userAgent)
+  // logCrawler(useUserAgent)
+
   try {
     let res 
     if (cookie === ''){
       // 不携带 cookie
-      res = await superagent
+      if (useUserAgent === 0) {
+        res = await superagent
+          .get(domain + hotUrl)
+      } else {
+        res = await superagent
         .get(domain + hotUrl)
         .set('User-Agent', userAgent)
+      }
     } else {
       // 携带 cookie
-      res = await superagent
-        .get(domain + hotUrl)
-        .set('cookie', cookie)
-        .set('User-Agent', userAgent)
+      if (useUserAgent === 0) {
+        res = await superagent
+          .get(domain + hotUrl)
+          .set('cookie', cookie)
+      } else {
+        res = await superagent
+          .get(domain + hotUrl)
+          .set('cookie', cookie)
+          .set('User-Agent', userAgent)
+      }
     }
 
     let $ = cheerio.load(res.text)
