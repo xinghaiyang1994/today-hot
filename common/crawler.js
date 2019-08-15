@@ -129,14 +129,13 @@ async function fetchHotList(info) {
       html: `${name}|${(new Date()).toLocaleString()}|${err.message}`
     })
   }
-  // logCrawler('res', result.length)
+  // logCrawler('res', result)
   return (Object.assign([], result)).length > 0
 }
 
 module.exports = {
   // 抓取数据
   async fetchAllData() {
-    let res = true
     let result = await findChannelAll()
     let list = result.toJSON()
 
@@ -144,12 +143,14 @@ module.exports = {
     await deleteListAll()
     
     // 遍历抓取插入列表
-    list.forEach(el => {
-      if (!fetchHotList(el)) {
-        res = false
-      }
+    let arrIsOkPromise = list.map(async el => {
+      let isOk = await fetchHotList(el)
+      return isOk
     })
-    return res
+    let arrIsOk = await Promise.all(arrIsOkPromise)
+
+    // logCrawler('arrIsOk', arrIsOk)
+    return arrIsOk.every(el => el)
   },
   async fetchSingleData(channelId) {
     // 获取单个渠道详情
