@@ -4,6 +4,8 @@ const cheerio = require('cheerio')
 const log = require('./log')
 const email  = require('./email')
 const specialChannelMethod = require('./special_channel_method')
+const { userAgents } = require('../utils/const')
+const { rnd } = require('../utils/tools')
 const debug = require('debug')
 const logCrawler = debug('crawler')
 
@@ -50,17 +52,24 @@ async function fetchHotList(info) {
     listUrlDom,
     listUrlRule
   } = info
+  let userAgent = userAgents[rnd(0, userAgents.length)]
   let titleDomHasChildren = listTitleDom !== ''
   let urlDomHasChildren = listUrlDom !== ''
   
+  // logCrawler(userAgent)
   try {
     let res 
     if (cookie === ''){
       // 不携带 cookie
-      res = await superagent.get(domain + hotUrl)
+      res = await superagent
+        .get(domain + hotUrl)
+        .set('User-Agent', userAgent)
     } else {
       // 携带 cookie
-      res = await superagent.get(domain + hotUrl).set('cookie', cookie)
+      res = await superagent
+        .get(domain + hotUrl)
+        .set('cookie', cookie)
+        .set('User-Agent', userAgent)
     }
 
     let $ = cheerio.load(res.text)
