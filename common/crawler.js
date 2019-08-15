@@ -52,7 +52,7 @@ async function fetchHotList(info) {
     listUrlDom,
     listUrlRule
   } = info
-  let userAgent = userAgents[rnd(0, userAgents.length)]
+  let userAgent = userAgents[rnd(0, userAgents.length - 1)]
   let titleDomHasChildren = listTitleDom !== ''
   let urlDomHasChildren = listUrlDom !== ''
   
