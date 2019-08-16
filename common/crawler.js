@@ -1,6 +1,7 @@
 // 爬虫
 const superagent = require('superagent')
 require('superagent-charset')(superagent)
+const Nightmare = require('nightmare') 
 const cheerio = require('cheerio')
 const log = require('./log')
 const email  = require('./email')
@@ -9,6 +10,8 @@ const { userAgents } = require('../utils/const')
 const { rnd } = require('../utils/tools')
 const debug = require('debug')
 const logCrawler = debug('crawler')
+
+const nightmare = Nightmare({ show: false })
 
 
 const {
@@ -39,7 +42,7 @@ function renderUrl(listUrlRule, info) {
   return res
 }
 
-// 请求
+// 普通页面抓取
 function fetchPage(info) {
   return new Promise(function (resolve, reject) {
     const { 
@@ -70,8 +73,29 @@ function fetchPage(info) {
       if (err) {
         return reject(err)
       }
-      resolve(res)
+      resolve(res.text)
     })
+  })
+}
+
+// SPA 页面抓取
+function fetchSpa(info) {
+  return new Promise(function (resolve, reject) {
+    const { 
+      domain,
+      hotUrl,
+      listDom
+    } = info
+    nightmare
+      .goto(domain + hotUrl)
+      .wait(listDom)
+      .evaluate(() => document.querySelector('body').innerHTML)
+      .then(res => {
+        resolve(res)
+      })
+      .catch(err => {
+        reject(err)
+      })
   })
 }
 
@@ -82,6 +106,7 @@ async function fetchHotList(info) {
     id,
     name,
     domain,
+    isSpa,
     listSpecialMethod,
     listDom,
     listTitleDom,
@@ -92,8 +117,15 @@ async function fetchHotList(info) {
   let urlDomHasChildren = listUrlDom !== ''
 
   try {
-    let resHtml = await fetchPage(info) 
-    let $ = cheerio.load(resHtml.text)
+    let resHtml
+    if (isSpa === 0) {
+      // 不是单页
+      resHtml = await fetchPage(info) 
+    } else {
+      // 单页
+      resHtml = await fetchSpa(info) 
+    }
+    let $ = cheerio.load(resHtml)
     let originList = []
 
     if (listSpecialMethod !== '') {
