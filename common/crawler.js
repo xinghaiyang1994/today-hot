@@ -1,7 +1,7 @@
 // 爬虫
 const superagent = require('superagent')
 require('superagent-charset')(superagent)
-const Nightmare = require('nightmare') 
+const phantom = require('phantom') 
 const cheerio = require('cheerio')
 const log = require('./log')
 const email  = require('./email')
@@ -10,9 +10,6 @@ const { userAgents } = require('../utils/const')
 const { rnd } = require('../utils/tools')
 const debug = require('debug')
 const logCrawler = debug('crawler')
-
-const nightmare = Nightmare({ show: false })
-
 
 const {
   findChannelAll,
@@ -83,19 +80,27 @@ function fetchSpa(info) {
   return new Promise(function (resolve, reject) {
     const { 
       domain,
-      hotUrl,
-      listDom
+      hotUrl
     } = info
-    nightmare
-      .goto(domain + hotUrl)
-      .wait(listDom)
-      .evaluate(() => document.querySelector('body').innerHTML)
-      .then(res => {
-        resolve(res)
-      })
-      .catch(err => {
-        reject(err)
-      })
+    let sitepage
+    let phInstance
+
+    phantom.create().then(instance => {
+      phInstance = instance
+      return instance.createPage()
+    }).then(page => {
+      sitepage = page
+      return page.open(domain + hotUrl)
+    }).then(() => {
+      return sitepage.property('content')
+    }).then(content => {
+      sitepage.close()
+      phInstance.exit()
+      resolve(content)
+    }).catch(err => {
+      phInstance.exit()
+      reject(err)
+    })
   })
 }
 
