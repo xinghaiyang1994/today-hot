@@ -22,7 +22,7 @@ const {
   deleteListByChannelId
 }  = require('../dao/list')
 
-let StartTime   // 统计抓取耗时
+let startTime   // 统计抓取耗时
 
 // 统一抓取错误处理
 function dealFetchError(info, err) {
@@ -219,6 +219,7 @@ async function dealAllChannel(arrChannel = []) {
     spaRes = await arrPromise(arrSpaChannel, 'queue', fetchSpaPage, browser)
     await browser.close()
   }
+  console.log('spa', Date.now - startTime)
 
   // 遍历抓取普通页面插入列表
   let arrCommonChannel = arrChannel.filter(el => el.isSpa === 0)
@@ -231,7 +232,7 @@ async function dealAllChannel(arrChannel = []) {
 module.exports = {
   // 抓取数据
   async fetchAllData() {
-    StartTime = Date.now()
+    startTime = Date.now()
     let result = await findChannelAll()
     let list = result.toJSON()
 
@@ -243,11 +244,11 @@ module.exports = {
 
     return {
       isTrue,
-      StartTime
+      startTime
     }
   },
   async fetchSingleData(channelId) {
-    StartTime = Date.now()
+    startTime = Date.now()
     // 获取单个渠道详情
     let resDetail = await findChannelDetailById(channelId)
     if (!resDetail) {
@@ -263,7 +264,7 @@ module.exports = {
 
     return {
       isTrue,
-      StartTime
+      startTime
     }
   }
 }
