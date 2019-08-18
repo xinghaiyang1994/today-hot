@@ -90,9 +90,7 @@ async function fetchSpa(info) {
   await page.goto(domain + hotUrl)
   await page.waitFor(listTitleDom)
 
-  let html = await page.evaluate(() => {
-    return document.querySelector('body').innerHTML
-  })
+  let html = await page.content()
   await browser.close()
   return html
 }
