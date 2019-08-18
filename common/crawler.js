@@ -86,6 +86,7 @@ async function htmlToList (info, resHtml) {
         domOriginUrl: urlDom.attr('href')
       })
     })
+    originList = originList.filter(el => el.title)
   }
 
   if (originList.length === 0) {
