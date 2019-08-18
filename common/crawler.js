@@ -22,6 +22,8 @@ const {
   deleteListByChannelId
 }  = require('../dao/list')
 
+let StartTime   // 统计抓取耗时
+
 // 统一抓取错误处理
 function dealFetchError(info, err) {
   const { 
@@ -228,6 +230,7 @@ async function dealAllChannel(arrChannel = []) {
 module.exports = {
   // 抓取数据
   async fetchAllData() {
+    StartTime = Date.now()
     let result = await findChannelAll()
     let list = result.toJSON()
 
@@ -235,9 +238,14 @@ module.exports = {
     await deleteListAll()
    
     // logCrawler('list', list)
-    return dealAllChannel(list)
+    let isTrue = dealAllChannel(list)
+    return {
+      isTrue,
+      StartTime
+    }
   },
   async fetchSingleData(channelId) {
+    StartTime = Date.now()
     // 获取单个渠道详情
     let resDetail = await findChannelDetailById(channelId)
     if (!resDetail) {
@@ -249,6 +257,10 @@ module.exports = {
     await deleteListByChannelId(channelId)
     
     // 抓取插入新列表
-    return dealAllChannel([detail])
+    let isTrue = dealAllChannel([detail])
+    return {
+      isTrue,
+      StartTime
+    }
   }
 }
