@@ -119,9 +119,12 @@ async function fetchSpaPage(info, browser) {
   try {
     // 获取内容
     const page = await browser.newPage()    // 创建一个 Page 实例
-    await page.goto(domain + hotUrl)   // 进入网址
+    await page.goto(domain + hotUrl, {
+      timeout: 120000
+    })   // 进入网址
     await page.waitFor(listDom)    // 等待目标元素出现，用于客户端渲染页面
     let resHtml = await page.content()
+    await page.close()
 
     // 处理数据并入库
     resIsTrue = await htmlToList(info, resHtml)
