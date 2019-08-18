@@ -219,7 +219,7 @@ async function dealAllChannel(arrChannel = []) {
     spaRes = await arrPromise(arrSpaChannel, 'queue', fetchSpaPage, browser)
     await browser.close()
   }
-  console.log('spa', Date.now - startTime)
+  console.log('spa', Date.now() - startTime)
 
   // 遍历抓取普通页面插入列表
   let arrCommonChannel = arrChannel.filter(el => el.isSpa === 0)
@@ -232,7 +232,7 @@ async function dealAllChannel(arrChannel = []) {
 module.exports = {
   // 抓取数据
   async fetchAllData() {
-    startTime = Date.now()
+    startTime = ()()
     let result = await findChannelAll()
     let list = result.toJSON()
 
