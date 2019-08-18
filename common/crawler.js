@@ -190,7 +190,7 @@ async function arrPromise(arr = [], type = 'concurrency', fn, ...rest) {
   if (type = 'queue') {
     // 队列
     for (let i = 0; i < arr.length; i ++) {
-      let isTrue = await fn(el, ...rest)
+      let isTrue = await fn(arr[i], ...rest)
       arrPromise.push(isTrue)
     }
   } else {
@@ -208,7 +208,7 @@ async function arrPromise(arr = [], type = 'concurrency', fn, ...rest) {
 async function dealAllChannel(arrChannel = []) {
   // 遍历抓取普通页面插入列表
   let arrCommonChannel = arrChannel.filter(el => el.isSpa === 0)
-  let commonRes = await arrPromise(arrCommonChannel, fetchCommonPage)
+  let commonRes = await arrPromise(arrCommonChannel, 'concurrency', fetchCommonPage)
 
   // 抓取所有 spa 页面
   let arrSpaChannel = arrChannel.filter(el => el.isSpa === 1)
@@ -217,7 +217,7 @@ async function dealAllChannel(arrChannel = []) {
     const browser = await puppeteer.launch({
       args: ['--no-sandbox']
     })
-    spaRes = await arrPromise(arrSpaChannel, fetchSpaPage, browser)
+    spaRes = await arrPromise(arrSpaChannel, 'queue', fetchSpaPage, browser)
     await browser.close()
   }
 
