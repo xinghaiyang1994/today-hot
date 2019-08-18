@@ -116,16 +116,12 @@ async function fetchSpaPage(info, browser) {
     listDom
   } = info
   let resIsTrue = false
-  let wrapDom = listDom.split(/\s/)[0]
-  console.log(wrapDom)
   try {
     // 获取内容
     const page = await browser.newPage()    // 创建一个 Page 实例
     await page.goto(domain + hotUrl)   // 进入网址
     await page.waitFor(listDom)    // 等待目标元素出现，用于客户端渲染页面
-    let resHtml = await page.evaluate(dom => {
-      return document.querySelector(dom).innerHTML
-    }, wrapDom)
+    let resHtml = await page.content()
 
     // 处理数据并入库
     resIsTrue = await htmlToList(info, resHtml)
@@ -216,12 +212,22 @@ async function dealAllChannel(arrChannel = []) {
   let arrSpaChannel = arrChannel.filter(el => el.isSpa === 1)
   let spaRes = true
   if (arrSpaChannel.length > 0) {
-    const browser = await puppeteer.launch({
-      args: ['--no-sandbox'],
-      timeout: 60000
-    })
-    spaRes = await arrPromise(arrSpaChannel, 'queue', fetchSpaPage, browser)
-    await browser.close()
+
+    setTimeout(async () => {
+      const browser = await puppeteer.launch({
+        args: ['--no-sandbox'],
+        timeout: 60000
+      })
+      await arrPromise(arrSpaChannel, 'queue', fetchSpaPage, browser)
+      await browser.close()
+    }, 10000)
+
+    // const browser = await puppeteer.launch({
+    //   args: ['--no-sandbox'],
+    //   timeout: 60000
+    // })
+    // spaRes = await arrPromise(arrSpaChannel, 'queue', fetchSpaPage, browser)
+    // await browser.close()
   }
   console.log('spa', Date.now() - startTime)
 
@@ -230,7 +236,8 @@ async function dealAllChannel(arrChannel = []) {
   let commonRes = await arrPromise(arrCommonChannel, 'concurrency', fetchCommonPage)
 
   // logCrawler('dealAllChannel', commonRes)
-  return commonRes && spaRes
+  // return commonRes && spaRes
+  return commonRes
 }
 
 module.exports = {
