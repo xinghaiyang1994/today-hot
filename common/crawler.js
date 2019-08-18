@@ -217,7 +217,8 @@ async function dealAllChannel(arrChannel = []) {
   let spaRes = true
   if (arrSpaChannel.length > 0) {
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox']
+      args: ['--no-sandbox'],
+      timeout: 60000
     })
     spaRes = await arrPromise(arrSpaChannel, 'queue', fetchSpaPage, browser)
     await browser.close()
