@@ -9,7 +9,7 @@ module.exports = {
     ctx.body = tools.dealBody({
       code: isTrue ? 0 : -1,
       data: {},
-      message: isTrue ? `抓取成功，耗时 ${StartTime} ms` : '抓取失败！'
+      message: isTrue ? `抓取成功，耗时 ${Date.now() - StartTime} ms` : '抓取失败！'
     })
   },
   async refreshSingle(ctx) {
@@ -20,7 +20,7 @@ module.exports = {
     ctx.body = tools.dealBody({
       code: isTrue ? 0 : -1,
       data: {},
-      message: isTrue ? `抓取成功，耗时 ${StartTime} ms` : '抓取失败！'
+      message: isTrue ? `抓取成功，耗时 ${Date.now() - StartTime} ms` : '抓取失败！'
     })
   }
 }
