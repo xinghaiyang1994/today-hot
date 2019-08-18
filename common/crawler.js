@@ -8,6 +8,7 @@ const email  = require('./email')
 const specialChannelMethod = require('./special_channel_method')
 const { userAgents } = require('../utils/const')
 const { rnd } = require('../utils/tools')
+const { env } = require('../config/default')
 const debug = require('debug')
 const logCrawler = debug('crawler')
 
@@ -160,10 +161,13 @@ async function fetchHotList(info) {
     result = await insertList(list)
   } catch (err) {
     log.logToFile('crawler.log', `${name}|${(new Date()).toLocaleString()}|${err.message}`)
-    email.send({
-      subject: '爬虫抓取失败',
-      html: `${name}|${(new Date()).toLocaleString()}|${err.message}`
-    })
+    // 正式环境发邮件
+    if (env !== 'local') {
+      email.send({
+        subject: '爬虫抓取失败',
+        html: `${name}|${(new Date()).toLocaleString()}|${err.message}`
+      })
+    }
   }
   // logCrawler('res', result)
   return (Object.assign([], result)).length > 0
