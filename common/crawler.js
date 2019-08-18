@@ -121,7 +121,9 @@ async function fetchSpaPage(info, browser) {
     const page = await browser.newPage()    // 创建一个 Page 实例
     await page.goto(domain + hotUrl)   // 进入网址
     await page.waitFor(listTitleDom)    // 等待目标元素出现，用于客户端渲染页面
-    let resHtml = await page.content()
+    let resHtml = await page.evaluate(() => {
+      return document.querySelector(listTitleDom.split(/\s/)[0]).innerHTML
+    })
 
     // 处理数据并入库
     resIsTrue = await htmlToList(info, resHtml)
