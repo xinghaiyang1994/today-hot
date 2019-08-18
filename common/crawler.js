@@ -237,8 +237,9 @@ module.exports = {
     // 删除所有列表
     await deleteListAll()
    
-    // logCrawler('list', list)
+    // 抓取插入新列表
     let isTrue = await dealAllChannel(list)
+
     return {
       isTrue,
       StartTime
@@ -258,6 +259,7 @@ module.exports = {
     
     // 抓取插入新列表
     let isTrue = await dealAllChannel([detail])
+
     return {
       isTrue,
       StartTime

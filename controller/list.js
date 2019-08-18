@@ -12,7 +12,7 @@ module.exports = {
       message: isTrue ? `抓取成功，耗时 ${StartTime} ms` : '抓取失败！'
     })
   },
-  async refisTruehSingle(ctx) {
+  async refreshSingle(ctx) {
     const { channelId } = ctx.query
     let { isTrue, StartTime } = await crawler.fetchSingleData(channelId)
 
