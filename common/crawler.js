@@ -186,12 +186,12 @@ async function fetchCommonPage(info) {
 // Promise.all 处理动态数组
 async function arrPromise(arr = [], type = 'concurrency', fn, ...rest) {
   // logCrawler('fn', rest)
-  let arrPromise = []
+  let arrIsTrue = []
   if (type = 'queue') {
     // 队列
     for (let i = 0; i < arr.length; i ++) {
       let isTrue = await fn(arr[i], ...rest)
-      arrPromise.push(isTrue)
+      arrIsTrue.push(isTrue)
     }
   } else {
     // 并发
