@@ -212,22 +212,12 @@ async function dealAllChannel(arrChannel = []) {
   let arrSpaChannel = arrChannel.filter(el => el.isSpa === 1)
   let spaRes = true
   if (arrSpaChannel.length > 0) {
-
-    setTimeout(async () => {
-      const browser = await puppeteer.launch({
-        args: ['--no-sandbox'],
-        timeout: 60000
-      })
-      await arrPromise(arrSpaChannel, 'queue', fetchSpaPage, browser)
-      await browser.close()
-    }, 10000)
-
-    // const browser = await puppeteer.launch({
-    //   args: ['--no-sandbox'],
-    //   timeout: 60000
-    // })
-    // spaRes = await arrPromise(arrSpaChannel, 'queue', fetchSpaPage, browser)
-    // await browser.close()
+    const browser = await puppeteer.launch({
+      args: ['--no-sandbox'],
+      timeout: 60000
+    })
+    spaRes = await arrPromise(arrSpaChannel, 'queue', fetchSpaPage, browser)
+    await browser.close()
   }
   console.log('spa', Date.now() - startTime)
 
@@ -236,8 +226,7 @@ async function dealAllChannel(arrChannel = []) {
   let commonRes = await arrPromise(arrCommonChannel, 'concurrency', fetchCommonPage)
 
   // logCrawler('dealAllChannel', commonRes)
-  // return commonRes && spaRes
-  return commonRes
+  return commonRes && spaRes
 }
 
 module.exports = {
