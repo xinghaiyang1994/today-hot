@@ -208,10 +208,6 @@ async function arrPromise(arr = [], type = 'concurrency', fn, ...rest) {
 
 // 处理渠道数组并抓取
 async function dealAllChannel(arrChannel = []) {
-  // 遍历抓取普通页面插入列表
-  let arrCommonChannel = arrChannel.filter(el => el.isSpa === 0)
-  let commonRes = await arrPromise(arrCommonChannel, 'concurrency', fetchCommonPage)
-
   // 抓取所有 spa 页面
   let arrSpaChannel = arrChannel.filter(el => el.isSpa === 1)
   let spaRes = true
@@ -223,6 +219,10 @@ async function dealAllChannel(arrChannel = []) {
     spaRes = await arrPromise(arrSpaChannel, 'queue', fetchSpaPage, browser)
     await browser.close()
   }
+
+  // 遍历抓取普通页面插入列表
+  let arrCommonChannel = arrChannel.filter(el => el.isSpa === 0)
+  let commonRes = await arrPromise(arrCommonChannel, 'concurrency', fetchCommonPage)
 
   // logCrawler('dealAllChannel', commonRes)
   return commonRes && spaRes
