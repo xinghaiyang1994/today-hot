@@ -232,7 +232,7 @@ async function dealAllChannel(arrChannel = []) {
 module.exports = {
   // 抓取数据
   async fetchAllData() {
-    startTime = ()()
+    startTime = Date.now()
     let result = await findChannelAll()
     let list = result.toJSON()
 
