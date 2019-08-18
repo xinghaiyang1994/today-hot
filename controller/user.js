@@ -60,10 +60,12 @@ module.exports = {
 
     },
     async getCaptcha (ctx) {
-        const captcha = svgCaptcha.create()
-        ctx.session.captcha = captcha.text.toLowerCase()
-        ctx.response.set('Content-Type', 'image/svg+xml')
-        ctx.body = String(captcha.data)
+      const captcha = svgCaptcha.create({
+        ignoreChars: '0o1il'
+      })
+      ctx.session.captcha = captcha.text.toLowerCase()
+      ctx.response.set('Content-Type', 'image/svg+xml')
+      ctx.body = String(captcha.data)
     },
     async getInfo (ctx) {
         checkLogin(ctx)

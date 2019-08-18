@@ -39,3 +39,22 @@
 .main-ls-title:hover{
   opacity: .5;
 }
+
+
+#suggest{
+  position: fixed;
+  top: 50%;
+  right: 0;
+  width: 100px;
+  background: red;
+}
+.suggest-wrap{
+  position: fixed;
+  top: 20px;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  background: aqua;
+  padding: 40px;
+  display: none;
+}

@@ -25,5 +25,23 @@
       <% } %>
     </div>
   </div>
+  <div id="suggest">反馈建议</div>
+  <div class="suggest-wrap">
+    <div class="suggest-wrap-close">X</div>
+    <div class="clearfix">
+      <span class="fl">你的联系方式</span>
+      <input class="fl" name="name" type="text">
+    </div>
+    <div class="clearfix">
+      <span class="fl">内容</span>
+      <textarea class="fl" name="content" cols="30" rows="10"></textarea>
+    </div>
+    <div class="clearfix">
+      <span class="fl">验证码</span>
+      <input class="fl" name="captcha" type="text">
+    </div>
+    <img class="fl" id="captcha" src="/suggest/captcha" alt="">
+    <button id="submit">点击</button>
+  </div>
 
 <%- include('./components/footer') %>

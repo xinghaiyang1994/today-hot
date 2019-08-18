@@ -10,6 +10,7 @@ module.exports = function (app) {
     router.use('/home', require('./home').routes())
     router.use('/user', require('./user').routes())
     router.use('/list', require('./list').routes())
+    router.use('/suggest', require('./suggest').routes())
 
     app.use(router.routes())
     app.use(router.allowedMethods())
