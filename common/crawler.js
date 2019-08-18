@@ -76,28 +76,24 @@ function fetchPage(info) {
 }
 
 // SPA 页面抓取
-function fetchSpa(info) {
-  return new Promise(function (resolve, reject) {
-    const { 
-      domain,
-      hotUrl,
-      listTitleDom
-    } = info
-    (async () => {
-      const browser = await puppeteer.launch({
-        args: ['--no-sandbox'],
-      });
-      const page = await browser.newPage()
-      await page.goto(domain + hotUrl)
-      await page.waitFor(listTitleDom)
-    
-      let html = await page.evaluate(() => {
-        return document.querySelector('body').innerHTML
-      })
-      await browser.close()
-      resolve(html)
-    })
+async function fetchSpa(info) {
+  const { 
+    domain,
+    hotUrl,
+    listTitleDom
+  } = info
+  const browser = await puppeteer.launch({
+    args: ['--no-sandbox'],
+  });
+  const page = await browser.newPage()
+  await page.goto(domain + hotUrl)
+  await page.waitFor(listTitleDom)
+
+  let html = await page.evaluate(() => {
+    return document.querySelector('body').innerHTML
   })
+  await browser.close()
+  return html
 }
 
 // 抓取单个页面中的列表
