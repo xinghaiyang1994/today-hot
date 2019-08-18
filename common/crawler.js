@@ -1,7 +1,7 @@
 // 爬虫
 const superagent = require('superagent')
 require('superagent-charset')(superagent)
-const phantom = require('phantom') 
+const puppeteer = require('puppeteer') 
 const cheerio = require('cheerio')
 const log = require('./log')
 const email  = require('./email')
@@ -80,26 +80,22 @@ function fetchSpa(info) {
   return new Promise(function (resolve, reject) {
     const { 
       domain,
-      hotUrl
+      hotUrl,
+      listTitleDom
     } = info
-    let sitepage
-    let phInstance
-
-    phantom.create().then(instance => {
-      phInstance = instance
-      return instance.createPage()
-    }).then(page => {
-      sitepage = page
-      return page.open(domain + hotUrl)
-    }).then(() => {
-      return sitepage.property('content')
-    }).then(content => {
-      sitepage.close()
-      phInstance.exit()
-      resolve(content)
-    }).catch(err => {
-      phInstance.exit()
-      reject(err)
+    (async () => {
+      const browser = await puppeteer.launch({
+        args: ['--no-sandbox'],
+      });
+      const page = await browser.newPage()
+      await page.goto(domain + hotUrl)
+      await page.waitFor(listTitleDom)
+    
+      let html = await page.evaluate(() => {
+        return document.querySelector('body').innerHTML
+      })
+      await browser.close()
+      resolve(html)
     })
   })
 }
