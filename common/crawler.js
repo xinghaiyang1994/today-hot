@@ -229,7 +229,7 @@ async function dealAllChannel(arrChannel = []) {
   let arrCommonChannel = arrChannel.filter(el => el.isSpa === 0)
   let commonRes = await arrPromise(arrCommonChannel, 'concurrency', fetchCommonPage)
 
-  console.log('spa %s , common %s', spaTime - startTime, Date.now() - startTime)
+  console.log('spa %s , common %s', spaTime - startTime, Date.now() - spaTime)
 
   // debugCrawler('dealAllChannel', commonRes)
   return commonRes && spaRes
