@@ -3,14 +3,14 @@ const superagent = require('superagent')
 require('superagent-charset')(superagent)
 const puppeteer = require('puppeteer') 
 const cheerio = require('cheerio')
-const log = require('./log')
+const { logCrawler } = require('../middlewares/log')
 const email  = require('./email')
 const specialChannelMethod = require('./special_channel_method')
 const { userAgents } = require('../utils/const')
 const { rnd } = require('../utils/tools')
 const { env } = require('../config/default')
 const debug = require('debug')
-const logCrawler = debug('crawler')
+const debugCrawler = debug('crawler')
 
 const {
   findChannelAll,
@@ -29,12 +29,13 @@ function dealFetchError(info, err) {
   const { 
     name
   } = info
-  log.logToFile('crawler.log', `${name}|${(new Date()).toLocaleString()}|${err.message}`)
+  logCrawler.error(`${name} | ${err}`)
   // 正式环境发邮件
   if (env !== 'local') {
     email.send({
+      name,
       subject: '爬虫抓取失败',
-      html: `${name}|${(new Date()).toLocaleString()}|${err.message}`
+      html: `${(new Date()).toLocaleString()} | ${name} | ${err}`
     })
   }
 }
@@ -104,7 +105,7 @@ async function htmlToList (info, resHtml) {
     }
   })
 
-  // return logCrawler(list)
+  // return debugCrawler(list)
   result = await insertList(list)
   return (Object.assign([], result)).length > 0 
 }
@@ -174,9 +175,8 @@ function fetchCommonePageContent(info) {
 // 抓取单个普通页面
 async function fetchCommonPage(info) {
   let resIsTrue = false
-  // logCrawler('fetchCommonPage', info)
+  // debugCrawler('fetchCommonPage', info)
   try {
-    
     // 获取内容
     let resHtml = await fetchCommonePageContent(info) 
 
@@ -185,13 +185,13 @@ async function fetchCommonPage(info) {
   } catch (err) {
     dealFetchError(info, err)
   }
-  // logCrawler('res', result)
+  // debugCrawler('res', result)
   return resIsTrue
 }
 
 // Promise.all 处理动态数组
 async function arrPromise(arr = [], type = 'concurrency', fn, ...rest) {
-  // logCrawler('fn', rest)
+  // debugCrawler('fn', rest)
   let arrIsTrue = []
   if (type = 'queue') {
     // 队列
@@ -223,13 +223,15 @@ async function dealAllChannel(arrChannel = []) {
     spaRes = await arrPromise(arrSpaChannel, 'queue', fetchSpaPage, browser)
     await browser.close()
   }
-  console.log('spa', Date.now() - startTime)
+  let spaTime = Date.now()
 
   // 遍历抓取普通页面插入列表
   let arrCommonChannel = arrChannel.filter(el => el.isSpa === 0)
   let commonRes = await arrPromise(arrCommonChannel, 'concurrency', fetchCommonPage)
 
-  // logCrawler('dealAllChannel', commonRes)
+  console.log('spa %s , common %s', spaTime - startTime, Date.now() - startTime)
+
+  // debugCrawler('dealAllChannel', commonRes)
   return commonRes && spaRes
 }
 

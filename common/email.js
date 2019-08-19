@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer')
-const log = require('./log')
+const { logEmail } = require('../middlewares/log')
 const { email } = require('../config/default')
 
 const transporter = nodemailer.createTransport({
@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 })
 
 module.exports = {
-  send({ subject, html}) {
+  send({ name, subject, html}) {
     const mailOptions = {
       from: email.from,
       to: email.to,
@@ -22,7 +22,7 @@ module.exports = {
     }
     transporter.sendMail(mailOptions, (err, info) => {
       if (err) {
-        return log.logToFile('email.log', `${html}|${(new Date()).toLocaleString()}|${err.message}`)
+        return logEmail.error(`${name} | ${err}`)
       }
       console.log('email sent: %s', info.response)
     })

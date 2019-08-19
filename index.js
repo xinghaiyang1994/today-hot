@@ -5,35 +5,18 @@ const staticCache = require('koa-static-cache')
 const bodyParser = require('koa-bodyparser')
 const cors = require('koa2-cors')
 const helmet = require('koa-helmet')
-const log4js = require('log4js')
 const session = require('koa-session-minimal')
 const MysqlSession = require('koa-mysql-session')
 
 const routes = require('./routes')
 const { database, port } = require('./config/default')
+const { logError } = require('./middlewares/log')
 
 // 定时任务
 require('./common/time')
 
 const app = new Koa()
-const logger = log4js.getLogger()
 let store = new MysqlSession(database)
-
-log4js.configure({
-    appenders: {
-        error: {       // 定义了名为 error 的 appender 
-            type: 'file',
-            filename: path.join(__dirname, './log/error.log')
-        }
-    },
-    categories: {
-        default: {
-            appenders: ['error'],      // 使用名为 error 的 appender 
-            level: 'error'      
-        }
-    },
-    pm2: true       // 使用 pm2 启动项目
-})
 
 // 提供安全 headers 
 app.use(helmet())
@@ -54,9 +37,9 @@ app.use(async (ctx, next) => {
             'message': err.message,
             'data': ''
         }
-        let errMsg = `${ctx.url} : ${err.message}`
+        let errMsg = `${ctx.url} | ${err.message}`
         console.log(errMsg)
-        logger.error(errMsg)
+        logError.error(errMsg)
     }
 })
 
