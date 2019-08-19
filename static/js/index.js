@@ -172,13 +172,13 @@ window.onload = function () {
   // 提交
   let canSubmit = true
   oSubmit.addEventListener('click', function () {
-    let name = document.querySelector('[name=name]').value
+    let contact = document.querySelector('[name=contact]').value
     let content = document.querySelector('[name=content]').value
     let captcha = document.querySelector('[name=captcha]').value
-    console.log(name, content, captcha)
+    console.log(contact, content, captcha)
 
     if ((content + '').trim() === '' || (captcha + '').trim() === '') {
-      alert('内容或验证码不能为空!')
+      return alert('内容或验证码不能为空!')
     }
 
     if (!canSubmit) {
