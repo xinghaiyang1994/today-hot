@@ -106,6 +106,9 @@ window.onload = function () {
     overflowHidden(oBody, false)
     show(oSubmitWrap, false)
     show(oSuggest, true)
+    oInputContact.value = ''
+    oInputContent.value = ''
+    oInputCaptcha.value = ''
   }
 
   let oBody = document.body
@@ -114,6 +117,9 @@ window.onload = function () {
   let oSubmitWrapClose = document.querySelector('.suggest-wrap-close')
   let oSubmit = document.querySelector('#submit')
   let oCaptcha = document.querySelector('#captcha')
+  let oInputContact = document.querySelector('[name=contact]')
+  let oInputContent = document.querySelector('[name=content]')
+  let oInputCaptcha = document.querySelector('[name=captcha]')
   
   let x = parseInt(getStyle(oSuggest, 'left'), 10)
   let y = parseInt(getStyle(oSuggest, 'top'), 10)
@@ -182,9 +188,9 @@ window.onload = function () {
   // 提交
   let canSubmit = true
   oSubmit.addEventListener('click', function () {
-    let contact = document.querySelector('[name=contact]').value
-    let content = document.querySelector('[name=content]').value
-    let captcha = document.querySelector('[name=captcha]').value
+    let contact = oInputContact.value
+    let content = oInputContent.value
+    let captcha = oInputCaptcha.value
     console.log(contact, content, captcha)
 
     if ((content + '').trim() === '' || (captcha + '').trim() === '') {
