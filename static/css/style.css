@@ -57,7 +57,7 @@ body{
   height: 38px;
   border: 2px solid #409eff;
   border-radius: 4px;
-  background: url('/images/suggest.png') no-repeat center;
+  background: #fff url('/images/suggest.png') no-repeat center;
   background-size: 24px 24px;
 }
 .suggest-wrap{
