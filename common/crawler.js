@@ -21,6 +21,12 @@ const {
   deleteListAll,
   deleteListByChannelId
 }  = require('../dao/list')
+const {
+  insertChannelFail,
+  deleteChannelFailByChannelIdList,
+  findCountGtTimesGroupByChannelId,
+  findCountGroupByChannelId
+}  = require('../dao/channel_fail')
 
 let startTime   // 统计抓取耗时
 
@@ -30,14 +36,6 @@ function dealFetchError(info, err) {
     name
   } = info
   logCrawler.error(`${name} | ${err}`)
-  // 正式环境发邮件
-  if (env !== 'local') {
-    email.send({
-      name,
-      subject: '爬虫抓取失败',
-      html: `${(new Date()).toLocaleString()} | ${name} | ${err}`
-    })
-  }
 }
 
 // 根据 listUrlRule 生成 url
@@ -133,7 +131,10 @@ async function fetchSpaPage(info, browser) {
   } catch (err) {
     dealFetchError(info, err)
   }
-  return resIsTrue
+  return {
+    id: info.id,
+    status: resIsTrue
+  }
 }
 
 // 获取单个普通页面内容
@@ -186,35 +187,44 @@ async function fetchCommonPage(info) {
     dealFetchError(info, err)
   }
   // debugCrawler('res', result)
-  return resIsTrue
+  return {
+    id: info.id,
+    status: resIsTrue
+  }
 }
 
 // Promise.all 处理动态数组
 async function arrPromise(arr = [], type = 'concurrency', fn, ...rest) {
   // debugCrawler('fn', rest)
-  let arrIsTrue = []
+  let arrRes = []
   if (type = 'queue') {
     // 队列
     for (let i = 0; i < arr.length; i ++) {
-      let isTrue = await fn(arr[i], ...rest)
-      arrIsTrue.push(isTrue)
+      let res = await fn(arr[i], ...rest)
+      arrRes.push(res)
     }
   } else {
     // 并发
     let arrPromise = arr.map(async el => {
-      let isTrue = await fn(el, ...rest)
-      return isTrue
+      let res = await fn(el, ...rest)
+      return res
     })
-    arrIsTrue = await Promise.all(arrPromise)
+    arrRes = await Promise.all(arrPromise)
   }
-  return arrIsTrue.every(el => el)
+  return {
+    arrRes,   // 抓取渠道数组，单项包含渠道 id 和单项抓取状态 status
+    status: arrRes.every(el => el.status)
+  }
 }
 
 // 处理渠道数组并抓取
 async function dealAllChannel(arrChannel = []) {
   // 抓取所有 spa 页面
   let arrSpaChannel = arrChannel.filter(el => el.isSpa === 1)
-  let spaRes = true
+  let spaRes = {
+    status: true,
+    arrRes: []
+  }
   if (arrSpaChannel.length > 0) {
     const browser = await puppeteer.launch({
       args: ['--no-sandbox'],
@@ -232,7 +242,56 @@ async function dealAllChannel(arrChannel = []) {
   console.log('spa %s , common %s', spaTime - startTime, Date.now() - spaTime)
 
   // debugCrawler('dealAllChannel', commonRes)
-  return commonRes && spaRes
+  let allStatus = commonRes.status && spaRes.status
+
+  // 抓取成功及错误异步处理
+  let arrFetch = spaRes.arrRes.concat(commonRes.arrRes)
+  dealFetchArr(arrFetch)
+
+  return allStatus
+}
+
+// 处理抓取数组（错误入库，成功删除相关记录）
+async function dealFetchArr(arrFetch = []) {
+  let arrSuccess = arrFetch.filter(el => el.status)
+  let arrFail = arrFetch.filter(el => !el.status)
+
+  // 成功
+  if (arrSuccess.length > 0) {
+    await deleteChannelFailByChannelIdList(arrSuccess.map(el => el.id))
+  }
+
+  if (arrFail.length === 0) {
+    return 
+  }
+  // 失败
+  await insertChannelFail(arrFail.map(el => ({ channelId: el.id })))
+
+  // 正式环境下统计大于三次抓取失败的发邮件
+  const failTimes = 3
+  let res = await findCountGtTimesGroupByChannelId(failTimes, arrFetch.map(el => el.id))
+  let arrNeedEmail = res.toJSON()
+
+  if (arrNeedEmail.length === 0) {
+    return
+  }
+  let content = `抓取失败大于 ${failTimes} 次渠道名称：`
+  arrNeedEmail.forEach((el, index) => {
+    content += el.name
+    if (index !== arrNeedEmail.length - 1) {
+      content += '、'
+    }
+  })
+  
+  // 正式环境发送邮件
+  if (env === 'local') {
+    return console.log(content)
+  }
+  email.send({
+    name: `抓取失败大于 ${failTimes} 次`,
+    subject: '爬虫抓取失败',
+    html: `${(new Date()).toLocaleString()} | ${content}`
+  })
 }
 
 module.exports = {
@@ -271,6 +330,21 @@ module.exports = {
     return {
       isTrue,
       startTime
+    }
+  },
+  async refetchFailData() {
+    // 获取抓取失败的渠道
+    let res = await findCountGroupByChannelId()
+    let arrNeedFetch = res.toJSON()
+
+    // 重新抓取
+    if (arrNeedFetch.length > 0) {
+      let isTrue = await dealAllChannel(arrNeedFetch)
+      if (isTrue) {
+        console.log('重新抓取：成功！')
+      } else {
+        console.log('重新抓取：失败！')
+      }
     }
   }
 }

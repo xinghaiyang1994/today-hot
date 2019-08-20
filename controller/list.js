@@ -14,6 +14,11 @@ module.exports = {
   },
   async refreshSingle(ctx) {
     const { channelId } = ctx.query
+
+    if (typeof channelId === 'undefined') {
+      throw new Error('渠道名称不正确！')
+    }
+
     let { isTrue, startTime } = await crawler.fetchSingleData(channelId)
 
     // console.log('单个结果', isTrue)
