@@ -12,18 +12,22 @@
         </a>
       <% } %>
     </div>
-    <div class="main">
-      <% for (let i = 0; i < list.length; i ++) { %>
-        <a href="<%= list[i].url %>" class="main-ls clearfix" target="_blanck">
-          <span class="main-ls-index fl">
-            <%= i + 1 %>
-          </span>
-          <span class="main-ls-title fl">
-            <%= list[i].title %>
-          </span>
-        </a>
+    <ul class="main">
+      <% if (list.length > 0) { %>
+        <% for (let i = 0; i < list.length; i ++) { %>
+          <li class="main-ls clearfix" target="_blanck">
+            <span class="main-ls-index fl">
+              <%= i + 1 %>
+            </span>
+            <a href="<%= list[i].url %>" class="main-ls-title fl">
+              <%= list[i].title %>
+            </a>
+          </li>
+        <% } %>
+      <% } else { %>
+        <li>暂无数据</li>
       <% } %>
-    </div>
+    </ul>
   </div>
   <div id="suggest"></div>
   <div class="suggest-wrap">
