@@ -85,6 +85,27 @@ function setStyle() {
     arguments[0].style[arguments[1]] = arguments[2]
   }
 }
+function setCookie (name, value, iDay) {
+  let aDomain = location.hostname.split('.')
+  let domain = aDomain[aDomain.length - 2] + '.' + aDomain[aDomain.length - 1]
+  if (iDay) {
+      let oDate = new Date()
+      oDate.setTime(oDate.getTime() + iDay * 24 * 60 * 60 * 1000)
+      document.cookie = `${name}=${value}; expires=${oDate.toGMTString()}; path=/; domain=${domain}`        // expires 、path 不区分大小写
+  } else {
+      document.cookie = `${name}=${value}; path=/; domain=${domain}`
+  }
+}
+function getCookie (name) {
+  var str = document.cookie
+  var arr = str.split('; ')
+  for(let i = 0; i < arr.length; i ++){
+      if(arr[i].split('=')[0] == name){
+          return arr[i].split('=')[1]
+      }
+  }
+  return ''
+}
 function show(dom, isShow) {
   setStyle(dom, {
     display: isShow ? 'block' : 'none'
@@ -110,6 +131,12 @@ window.onload = function () {
     oInputContent.value = ''
     oInputCaptcha.value = ''
   }
+  function setSuggestPosition(position) {
+    setStyle(oSuggest, {
+      left: position.x + 'px',
+      top: position.y + 'px',
+    })
+  }
 
   let oBody = document.body
   let oSuggest = document.querySelector('#suggest')
@@ -120,24 +147,62 @@ window.onload = function () {
   let oInputContact = document.querySelector('[name=contact]')
   let oInputContent = document.querySelector('[name=content]')
   let oInputCaptcha = document.querySelector('[name=captcha]')
+  let cookieName = location.host
   
-  let x = parseInt(getStyle(oSuggest, 'left'), 10)
-  let y = parseInt(getStyle(oSuggest, 'top'), 10)
+  const widthSuggest = oSuggest.offsetWidth
+  const heightSuggest = oSuggest.offsetHeight
+  const widthBody = oBody.offsetWidth
+  const heightBody = oBody.offsetHeight
+  // 拖动范围
+  const distance = {
+    x: {
+      start: 0,
+      end: widthBody - widthSuggest
+    },
+    y: {
+      start: heightSuggest / 2,
+      end: heightBody - heightSuggest + heightSuggest / 2
+    }
+  }
+
+  let x = 0
+  let y = 0
+
+  // 读取之前拖拽的位置
+  let position = getCookie(cookieName)
+  if (position) {
+    console.log(position)
+    position = JSON.parse(position)
+    setSuggestPosition(position)
+    x = position.x
+    y = position.y
+  } else {
+    x = parseInt(getStyle(oSuggest, 'left'), 10)
+    y = parseInt(getStyle(oSuggest, 'top'), 10)
+  }
   
   // pc 端拖拽
   oSuggest.addEventListener('mousedown', function (e) {
     function move(e) {
       x = (e.clientX - disX)
       y = (e.clientY - disY)
-      setStyle(oSuggest, {
-        left: x + 'px',
-        top: y + 'px',
-      })
+      if (x < distance.x.start) {
+        x = distance.x.start
+      } else if (x > distance.x.end) {
+        x = distance.x.end
+      }
+      if (y < distance.y.start) {
+        y = distance.y.start
+      } else if (y > distance.y.end) {
+        y = distance.y.end
+      }
+      setSuggestPosition({x, y})
     }
     function up(e) {
-      oSuggest.removeEventListener('mousemove', move)
-      oSuggest.removeEventListener('mouseup', up)
+      window.removeEventListener('mousemove', move)
+      window.removeEventListener('mouseup', up)
 
+      setCookie(cookieName, JSON.stringify({x, y}), 7)
       // click 打开反馈建议弹框
       if ((Date.now() - clickStartTime) < 300) {
         openSuggest()
@@ -147,8 +212,8 @@ window.onload = function () {
     let disX = e.clientX - x
     let disY = e.clientY - y
 
-    oSuggest.addEventListener('mousemove', move)
-    oSuggest.addEventListener('mouseup', up)
+    window.addEventListener('mousemove', move)
+    window.addEventListener('mouseup', up)
   })
 
   // m 端拖拽
@@ -157,15 +222,24 @@ window.onload = function () {
       let target = e.touches[0]
       x = (target.clientX - disX)
       y = (target.clientY - disY)
-      setStyle(oSuggest, {
-        left: x + 'px',
-        top: y + 'px',
-      })
+      if (x < distance.x.start) {
+        x = distance.x.start
+      } else if (x > distance.x.end) {
+        x = distance.x.end
+      }
+      if (y < distance.y.start) {
+        y = distance.y.start
+      } else if (y > distance.y.end) {
+        y = distance.y.end
+      }
+      setSuggestPosition({x, y})
       e.preventDefault()
     }
     function up() {
       oSuggest.removeEventListener('touchmove', move)
       oSuggest.removeEventListener('touchend', up)
+
+      setCookie(cookieName, JSON.stringify({x, y}), 7)
     }
     let target = e.touches[0]
     let disX = target.clientX - x
