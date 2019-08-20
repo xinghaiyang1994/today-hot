@@ -90,15 +90,31 @@ function show(dom, isShow) {
     display: isShow ? 'block' : 'none'
   })
 }
+function overflowHidden(dom, isTrue) {
+  setStyle(dom, {
+    overflow: isTrue ? 'hidden' : 'auto'
+  })
+}
 
 window.onload = function () {
+  function openSuggest() {
+    overflowHidden(oBody, true)
+    show(oSubmitWrap, true)
+    show(oSuggest, false)
+  }
+  function closeSuggest() {
+    overflowHidden(oBody, false)
+    show(oSubmitWrap, false)
+    show(oSuggest, true)
+  }
+
+  let oBody = document.body
   let oSuggest = document.querySelector('#suggest')
   let oSubmitWrap = document.querySelector('.suggest-wrap')
   let oSubmitWrapClose = document.querySelector('.suggest-wrap-close')
   let oSubmit = document.querySelector('#submit')
   let oCaptcha = document.querySelector('#captcha')
   
-
   let x = parseInt(getStyle(oSuggest, 'left'), 10)
   let y = parseInt(getStyle(oSuggest, 'top'), 10)
   
@@ -112,19 +128,21 @@ window.onload = function () {
         top: y + 'px',
       })
     }
-    function up() {
-      window.removeEventListener('mousemove', move)
-      window.removeEventListener('mouseup', up)
-      oSuggest.releaseCapture && oSuggest.releaseCapture()
+    function up(e) {
+      oSuggest.removeEventListener('mousemove', move)
+      oSuggest.removeEventListener('mouseup', up)
+
+      // click 打开反馈建议弹框
+      if ((Date.now() - clickStartTime) < 300) {
+        openSuggest()
+      }
     }
-    
+    let clickStartTime = Date.now()
     let disX = e.clientX - x
     let disY = e.clientY - y
 
-    window.addEventListener('mousemove', move)
-    window.addEventListener('mouseup', up)
-
-    oSuggest.setCapture && oSuggest.setCapture()
+    oSuggest.addEventListener('mousemove', move)
+    oSuggest.addEventListener('mouseup', up)
   })
 
   // m 端拖拽
@@ -137,31 +155,23 @@ window.onload = function () {
         left: x + 'px',
         top: y + 'px',
       })
+      e.preventDefault()
     }
     function up() {
-      window.removeEventListener('touchmove', move)
-      window.removeEventListener('touchend', up)
+      oSuggest.removeEventListener('touchmove', move)
+      oSuggest.removeEventListener('touchend', up)
     }
     let target = e.touches[0]
     let disX = target.clientX - x
     let disY = target.clientY - y
 
-    window.addEventListener('touchmove', move)
-    window.addEventListener('touchend', up)
-
-  })
-
-  // 打开反馈建议弹框
-  oSuggest.addEventListener('click', function () {
-    show(oSubmitWrap, true)
-    show(oSuggest, false)
+    oSuggest.addEventListener('touchmove', move)
+    oSuggest.addEventListener('touchend', up)
+    console.log('touch')
   })
 
   // 关闭反馈建议弹框
-  oSubmitWrapClose.addEventListener('click', function () {
-    show(oSubmitWrap, false)
-    show(oSuggest, true)
-  })
+  oSubmitWrapClose.addEventListener('click', closeSuggest)
 
   // 刷新验证码
   oCaptcha.addEventListener('click', function () {
@@ -197,11 +207,7 @@ window.onload = function () {
       data,
       success(res) {
         alert(res.message)
-        if (res.code === 0) {
-
-        } else {
-          
-        }
+        closeSuggest()
         canSubmit = true
       },
       error(err) {
@@ -209,5 +215,10 @@ window.onload = function () {
         console.log(err)
       }
     })
+  })
+
+  // m 端防止滚动穿透
+  oSubmitWrap.addEventListener('touchmove', function (e) {
+    e.preventDefault()
   })
 }

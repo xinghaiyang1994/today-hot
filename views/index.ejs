@@ -25,23 +25,30 @@
       <% } %>
     </div>
   </div>
-  <div id="suggest">反馈建议</div>
+  <div id="suggest"></div>
   <div class="suggest-wrap">
-    <div class="suggest-wrap-close">X</div>
-    <div class="clearfix">
-      <span class="fl">联系方式</span>
-      <input class="fl" name="contact" type="text">
+    <div class="suggest-main">
+      <h3 class="suggest-title">反馈建议</h3>
+      <div class="suggest-ls clearfix">
+        <span class="suggest-ls-title fl">联系方式</span>
+        <input class="suggest-ls-input w-200 fl" name="contact" type="text">
+      </div>
+      <div class="suggest-ls clearfix">
+        <span class="suggest-ls-title fl">内容</span>
+        <textarea class="suggest-ls-textarea fl" name="content" cols="30" rows="10"></textarea>
+      </div>
+      <div class="suggest-ls mb-20 clearfix">
+        <span class="suggest-ls-title fl">验证码</span>
+        <div class="w-200 fl clearfix">
+          <input class="suggest-ls-input w-100 fl" name="captcha" type="text">
+          <img class="suggest-captcha fr" id="captcha" src="/suggest/captcha" alt="">
+        </div>
+      </div>
+      <div class="clearfix">
+        <button class="suggest-btn suggest-wrap-close fl">取消</button>
+        <button class="suggest-btn fr" id="submit">提交</button>
+      </div>
     </div>
-    <div class="clearfix">
-      <span class="fl">内容</span>
-      <textarea class="fl" name="content" cols="30" rows="10"></textarea>
-    </div>
-    <div class="clearfix">
-      <span class="fl">验证码</span>
-      <input class="fl" name="captcha" type="text">
-    </div>
-    <img class="fl" id="captcha" src="/suggest/captcha" alt="">
-    <button id="submit">点击</button>
   </div>
 
 <%- include('./components/footer') %>

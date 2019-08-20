@@ -9,9 +9,24 @@ html{-webkit-tap-highlight-color: transparent;}
 body{font:16px 'Microsoft yahei';}
 em,i{font-style:normal;}
 h1,h2,h3,h4,h5,h6{font-weight:normal;}
+input,textarea{
+  outline: none;
+  resize: none;
+}
 
 /*常用*/
 .fl{float:left;}
 .fr{float:right;}
 .clearfix{zoom: 1;}
 .clearfix::after{content:'';display:block;clear:both;}
+
+.cm-flex{
+  display: flex;
+}
+.cm-flex-1{
+  flex: 1;
+}
+.cm-flex-column{
+  display: flex;
+  flex-direction: column;
+}
