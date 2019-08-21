@@ -298,6 +298,7 @@ module.exports = {
   // 抓取数据
   async fetchAllData() {
     startTime = Date.now()
+
     let result = await findChannelAll()
     let list = result.toJSON()
 
@@ -314,6 +315,7 @@ module.exports = {
   },
   async fetchSingleData(channelId) {
     startTime = Date.now()
+
     // 获取单个渠道详情
     let resDetail = await findChannelDetailById(channelId)
     if (!resDetail) {
@@ -333,6 +335,9 @@ module.exports = {
     }
   },
   async refetchFailData() {
+    startTime = Date.now()
+    let msg
+
     // 获取抓取失败的渠道
     let res = await findCountGroupByChannelId()
     let arrNeedFetch = res.toJSON()
@@ -340,11 +345,10 @@ module.exports = {
     // 重新抓取
     if (arrNeedFetch.length > 0) {
       let isTrue = await dealAllChannel(arrNeedFetch)
-      if (isTrue) {
-        console.log('重新抓取：成功！')
-      } else {
-        console.log('重新抓取：失败！')
-      }
+      msg = isTrue ? `重新抓取成功，耗时 ${Date.now() - startTime} ms` : '重新抓取失败'
+    } else {
+      msg = '暂无失败请求'
     }
+    return msg
   }
 }

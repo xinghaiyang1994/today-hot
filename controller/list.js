@@ -3,7 +3,7 @@ const crawler = require('../common/crawler')
 
 module.exports = {
   async refreshListAll(ctx) {
-    let { isTrue, startTime } = await crawler.fetchAllData()
+    const { isTrue, startTime } = await crawler.fetchAllData()
 
     // console.log('所有结果', isTrue)
     ctx.body = tools.dealBody({
@@ -19,7 +19,7 @@ module.exports = {
       throw new Error('渠道名称不正确！')
     }
 
-    let { isTrue, startTime } = await crawler.fetchSingleData(channelId)
+    const { isTrue, startTime } = await crawler.fetchSingleData(channelId)
 
     // console.log('单个结果', isTrue)
     ctx.body = tools.dealBody({
