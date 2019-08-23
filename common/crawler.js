@@ -178,6 +178,7 @@ async function fetchCommonPage(info) {
   let resIsTrue = false
   // debugCrawler('fetchCommonPage', info)
   try {
+    q
     // 获取内容
     let resHtml = await fetchCommonePageContent(info) 
 
