@@ -43,6 +43,7 @@
 html{
   height: 100%;
   user-select: none;
+  background: rgba(0,132,255,.1);
 }
 body{
   height: 100%;
