@@ -23,10 +23,11 @@ module.exports = {
         })
     }).fetchAll() 
   },
-  // 统计所有有失败的渠道列表
+  // 统计所有有失败的已经开启的渠道列表
   findCountGroupByChannelId() {
     return ChannelFail.query(function (qb) {
       qb.groupBy('channel_id')
+        .where('channel.is_open', '=', 1)
         .count('channel_id as num')
         .select('channel_id', 'channel.*')
         .leftJoin('channel', function() {

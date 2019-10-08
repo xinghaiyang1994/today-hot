@@ -308,9 +308,12 @@ module.exports = {
     // 抓取插入新列表
     let isTrue = await dealAllChannel(list)
 
+    // 信息
+    const message = isTrue ? `抓取成功，耗时 ${Date.now() - startTime} ms` : '抓取失败！'
+
     return {
       isTrue,
-      startTime
+      message
     }
   },
   async fetchSingleData(channelId) {
@@ -329,14 +332,18 @@ module.exports = {
     // 抓取插入新列表
     let isTrue = await dealAllChannel([detail])
 
+    // 信息
+    const message = isTrue ? `抓取成功，耗时 ${Date.now() - startTime} ms` : '抓取失败！'
+
     return {
       isTrue,
-      startTime
+      message
     }
   },
   async refetchFailData() {
     startTime = Date.now()
-    let msg
+    let isTrue = true
+    let message
 
     // 获取抓取失败的渠道
     let res = await findCountGroupByChannelId()
@@ -344,11 +351,15 @@ module.exports = {
 
     // 重新抓取
     if (arrNeedFetch.length > 0) {
-      let isTrue = await dealAllChannel(arrNeedFetch)
-      msg = isTrue ? `重新抓取成功，耗时 ${Date.now() - startTime} ms` : '重新抓取失败'
+      isTrue = await dealAllChannel(arrNeedFetch)
+      message = isTrue ? `重新抓取成功，耗时 ${Date.now() - startTime} ms` : '重新抓取失败'
     } else {
-      msg = '暂无失败请求'
+      message = '暂无失败请求'
     }
-    return msg
+
+    return {
+      isTrue,
+      message
+    }
   }
 }

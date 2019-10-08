@@ -12,7 +12,7 @@ schedule.scheduleJob('0 0 * * * *', async () => {
 
 // 每个小时抓取更新所有列表
 schedule.scheduleJob('0 10,20,30,40,50 * * * *', async () => {
-  let msg = await crawler.refetchFailData()
-  let log = '失败列表重新抓取：' + msg
+  let { message } = await crawler.refetchFailData()
+  let log = '失败列表重新抓取：' + message
   console.log(log)
 })

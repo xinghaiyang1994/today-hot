@@ -3,13 +3,13 @@ const crawler = require('../common/crawler')
 
 module.exports = {
   async refreshListAll(ctx) {
-    const { isTrue, startTime } = await crawler.fetchAllData()
+    const { isTrue, message } = await crawler.fetchAllData()
 
     // console.log('所有结果', isTrue)
     ctx.body = tools.dealBody({
       code: isTrue ? 0 : -1,
       data: {},
-      message: isTrue ? `抓取成功，耗时 ${Date.now() - startTime} ms` : '抓取失败！'
+      message
     })
   },
   async refreshSingle(ctx) {
@@ -19,13 +19,22 @@ module.exports = {
       throw new Error('渠道名称不正确！')
     }
 
-    const { isTrue, startTime } = await crawler.fetchSingleData(channelId)
+    const { isTrue, message } = await crawler.fetchSingleData(channelId)
 
-    // console.log('单个结果', isTrue)
+    // console.log('单个结果', isTrue, message)
     ctx.body = tools.dealBody({
       code: isTrue ? 0 : -1,
       data: {},
-      message: isTrue ? `抓取成功，耗时 ${Date.now() - startTime} ms` : '抓取失败！'
+      message
+    })
+  },
+  async refreshFail(ctx) {
+    const { isTrue, message } = await crawler.refetchFailData()
+    
+    return ctx.body = tools.dealBody({
+      code: isTrue ? 0 : -1,
+      data: {},
+      message
     })
   }
 }
