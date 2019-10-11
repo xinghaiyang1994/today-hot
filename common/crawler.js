@@ -144,7 +144,7 @@ function fetchCommonePageContent(info) {
       domain,
       hotUrl,
       cookie,
-      useUserAgent,
+      isUseUserAgent,
       charset
     } = info
     let request = superagent.get(domain + hotUrl)
@@ -155,7 +155,7 @@ function fetchCommonePageContent(info) {
     }
 
     // 设置 userAgent
-    if (useUserAgent !== 0) {
+    if (isUseUserAgent !== 0) {
       request = request.set('User-Agent', userAgents[rnd(0, userAgents.length - 1)])
     }
 
