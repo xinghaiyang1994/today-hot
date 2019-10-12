@@ -1,5 +1,4 @@
 const ChannelFail = require('../models/channel_fail')
-const db = require('../middlewares/db')
 
 module.exports = {
   // 批量添加渠道失败列表

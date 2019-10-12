@@ -1,5 +1,5 @@
 const List = require('../models/list')
-const db = require('../middlewares/db')
+const db = require('../middlewares/mysql')
 
 module.exports = {
   // 获取单个渠道下的所有列表
