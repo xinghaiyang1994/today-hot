@@ -14,6 +14,7 @@ module.exports = {
   },
   async refreshSingle(ctx) {
     const { channelId } = ctx.query
+    console.log(ctx.session)
 
     if (typeof channelId === 'undefined') {
       throw new Error('渠道名称不正确！')

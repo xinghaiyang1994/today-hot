@@ -9,6 +9,6 @@ const knex = require('knex')({
 
 const db = require('bookshelf')(knex)
 
-db.plugin(['bookshelf-virtuals-plugin', 'bookshelf-camelcase'])
+db.plugin(['bookshelf-virtuals-plugin', 'bookshelf-case-converter-plugin'])
 
 module.exports = db

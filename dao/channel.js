@@ -7,6 +7,6 @@ module.exports = {
   },
   // 根据 id 获取单个已经开启的渠道详情
   findChannelDetailById(id) {
-    return Channel.forge().where({id, 'is_open': 1}).fetch()
+    return Channel.forge().where({id, 'is_open': 1}).fetch({ require: false })
   }
 }
