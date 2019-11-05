@@ -4,11 +4,16 @@ const {
   findChannelDetailById,
   updateChannelOpenCtrl,
   addChannel,
-  updateChannel
+  updateChannel,
+  deleteChannel
 } = require('../../dao/channel')
+const crawler = require('../../common/crawler')
+const { dealBody } = require('../../utils/tools')
+
 
 const resolvers = {
   Query: {
+    // 获取渠道列表（翻页）
     async channelList(obj, { current, pageSize }) {
       // console.log({ current,pageSize })
       let list = await findChannelPage({ current, pageSize })
@@ -18,6 +23,7 @@ const resolvers = {
         total
       }
     },
+    // 获取单个渠道详情
     async channelDetail(obj, { id }) {
       let detailDao = await findChannelDetailById(id)
       // console.log(detailDao)
@@ -28,6 +34,7 @@ const resolvers = {
     }
   },
   Mutation: {
+    // 是否开启渠道
     async channelOpenCtrl(obj, { id, isOpen }) {
       const resDao = await updateChannelOpenCtrl({ id, isOpen })
       const res = resDao.toJSON()
@@ -36,6 +43,7 @@ const resolvers = {
         isOpen: res.isOpen,
       }
     },
+    // 新增或修改单个渠道
     async channelOperate(obj, { form, type }) {
       let { 
         id,
@@ -69,6 +77,36 @@ const resolvers = {
       const detail = detailDao.toJSON()
       return {
         id: detail.id
+      }
+    },
+    // 删除单个渠道
+    async channelDelete(obj, { id }) {
+      await deleteChannel(id)
+      return {
+        id
+      }
+    },
+    // 重新抓取多个或全部
+    async channelMutiRefresh(obj, { type, channelList = []}) {
+      if (type === 'muti') {
+        console.log(channelList)
+
+        const { isTrue, message } = await crawler.fetchArrayData(channelList)
+
+        // console.log('所有结果', isTrue)
+        console.log(channelList)
+        return dealBody({
+          code: isTrue ? 0 : -1,
+          message
+        })
+      }
+
+      if (type === 'all') {
+        const { isTrue, message } = await crawler.fetchAllData()
+        return dealBody({
+          code: isTrue ? 0 : -1,
+          message
+        })
       }
     }
   }

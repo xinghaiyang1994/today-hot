@@ -2,6 +2,7 @@ const tools = require('../utils/tools')
 const crawler = require('../common/crawler')
 
 module.exports = {
+  // 重新抓取所有
   async refreshListAll(ctx) {
     const { isTrue, message } = await crawler.fetchAllData()
 
@@ -12,6 +13,7 @@ module.exports = {
       message
     })
   },
+  // 重新抓取单个
   async refreshSingle(ctx) {
     const { channelId } = ctx.query
     console.log(ctx.session)
@@ -29,6 +31,7 @@ module.exports = {
       message
     })
   },
+  // 重新抓取失败
   async refreshFail(ctx) {
     const { isTrue, message } = await crawler.refetchFailData()
     

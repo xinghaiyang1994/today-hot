@@ -39,7 +39,12 @@ const typeDefs = gql`
     listTitleDom: String
     listUrlDom: String
     listUrlRule: String
-    sort: String
+    sort: Int
+  }
+
+  type CommonRes {
+    code: Int
+    message: String
   }
 
   type Query {
@@ -50,6 +55,8 @@ const typeDefs = gql`
   type Mutation {
     channelOpenCtrl(id: Int, isOpen: Int): ChannelDetail
     channelOperate(form: channelInput, type: String!): ChannelDetail
+    channelDelete(id: Int!): ChannelDetail
+    channelMutiRefresh(type: String!, channelList: [Int]): CommonRes
   }
 `
 

@@ -29,4 +29,15 @@ module.exports = {
   updateChannel({ id, name, domain, isOpen, isSpa, cookie, isUseUserAgent, charset, hotUrl, listSpecialMethod, listDom, listTitleDom, listUrlDom, listUrlRule, sort }) {
     return Channel.forge({ id }).save({ name, domain, isOpen, isSpa, cookie, isUseUserAgent, charset, hotUrl, listSpecialMethod, listDom, listTitleDom, listUrlDom, listUrlRule, sort }, { method: 'update' })
   },
+  // 删除单个渠道
+  deleteChannel(id) {
+    return Channel.forge({ id }).destroy({ require: false }) 
+  },
+  // 获取指定数组中的开启的渠道的列表
+  findOpenChannelListInArray(channelList) {
+    return Channel.query(function (qb) {
+      qb.where('id', 'in', channelList)
+        .andWhere('is_open', '=', 1) 
+    }).fetchAll()
+  }
 }

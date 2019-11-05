@@ -14,12 +14,14 @@ const debugCrawler = debug('crawler')
 
 const {
   findChannelAll,
-  findChannelDetailById
+  findChannelDetailById,
+  findOpenChannelListInArray
 }  = require('../dao/channel')
 const {
   insertList,
   deleteListAll,
-  deleteListByChannelId
+  deleteListByChannelId,
+  deleteListList
 }  = require('../dao/list')
 const {
   insertChannelFail,
@@ -313,6 +315,33 @@ module.exports = {
 
     return {
       isTrue,
+      message
+    }
+  },
+  async fetchArrayData(channelList = []) {
+    startTime = Date.now()
+
+    let result = await findOpenChannelListInArray(channelList)
+    let list = result.toJSON()
+    // console.log(list)
+    if (list.length === 0) {
+      return {
+        isTrue: true,
+        message: '请最少选择一个开启的渠道！'
+      }
+    }
+
+    // 删除指定列表
+    await deleteListList(list.map(el => el.id))
+   
+    // 抓取插入新列表
+    let isTrue = await dealAllChannel(list)
+
+    // 信息
+    const message = isTrue ? `抓取成功，耗时 ${Date.now() - startTime} ms` : '抓取失败！'
+
+    return {
+      isTrue: true,
       message
     }
   },
