@@ -1,4 +1,4 @@
-const tools = require('../utils/tools')
+const { dealBody } = require('../utils/tools')
 const crawler = require('../common/crawler')
 
 module.exports = {
@@ -7,7 +7,7 @@ module.exports = {
     const { isTrue, message } = await crawler.fetchAllData()
 
     // console.log('所有结果', isTrue)
-    ctx.body = tools.dealBody({
+    ctx.body = dealBody({
       code: isTrue ? 0 : -1,
       data: {},
       message
@@ -25,7 +25,7 @@ module.exports = {
     const { isTrue, message } = await crawler.fetchSingleData(channelId)
 
     // console.log('单个结果', isTrue, message)
-    ctx.body = tools.dealBody({
+    ctx.body = dealBody({
       code: isTrue ? 0 : -1,
       data: {},
       message
@@ -35,7 +35,7 @@ module.exports = {
   async refreshFail(ctx) {
     const { isTrue, message } = await crawler.refetchFailData()
     
-    return ctx.body = tools.dealBody({
+    return ctx.body = dealBody({
       code: isTrue ? 0 : -1,
       data: {},
       message

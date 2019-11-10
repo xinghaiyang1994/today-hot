@@ -9,7 +9,8 @@ module.exports = function (app) {
   // 子路由
   router.use('/list', require('./list').routes())
   router.use('/suggest', require('./suggest').routes())
-  router.use('/graphql', require('./graphql').routes())
+  router.use('/channel', require('./channel').routes())
+  router.use('/user', require('./user').routes())
 
   app.use(router.routes())
   app.use(router.allowedMethods())

@@ -20,13 +20,11 @@
   },
   "homepage": "https://github.com/xinghaiyang1994/sea-koa#readme",
   "dependencies": {
-    "apollo-server-koa": "^2.9.6",
     "bookshelf": "^1.0.0",
     "bookshelf-case-converter-plugin": "^1.0.0",
     "bookshelf-virtuals-plugin": "^0.1.1",
     "cheerio": "^1.0.0-rc.3",
     "ejs": "^2.7.1",
-    "graphql": "^14.5.8",
     "knex": "^0.19.4",
     "koa": "^2.5.2",
     "koa-body": "^4.1.1",

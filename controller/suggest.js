@@ -19,10 +19,10 @@ module.exports = {
     
     // 校验
     if ((content + '').trim() === '' || (captcha + '').trim() === '') {
-      throw new Error('内容或验证码不能为空！')
+      throw new Error('内容或验证码不能为空!')
     }
     if (captcha.toLowerCase() !== sCaptcha) {
-      throw new Error('验证码错误！')
+      throw new Error('验证码错误!')
     }
 
     // 新增入库

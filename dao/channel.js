@@ -10,8 +10,8 @@ module.exports = {
     return Channel.forge().where({ id }).fetch({ require: false })
   },
   // 获取渠道列表(翻页)
-  findChannelPage({ current, pageSize }) {
-    return Channel.forge().fetchPage({ page: current, pageSize })
+  findChannelPage({ page, pageSize }) {
+    return Channel.forge().fetchPage({ page, pageSize })
   },
   // 获取渠道总数
   findChannelCount() {
@@ -27,7 +27,8 @@ module.exports = {
   },
   // 修改单个渠道
   updateChannel({ id, name, domain, isOpen, isSpa, cookie, isUseUserAgent, charset, hotUrl, listSpecialMethod, listDom, listTitleDom, listUrlDom, listUrlRule, sort }) {
-    return Channel.forge({ id }).save({ name, domain, isOpen, isSpa, cookie, isUseUserAgent, charset, hotUrl, listSpecialMethod, listDom, listTitleDom, listUrlDom, listUrlRule, sort }, { method: 'update' })
+    return Channel.forge({ id }).save({ name, domain, isOpen, isSpa, cookie, isUseUserAgent, charset, hotUrl, listSpecialMethod, listDom, listTitleDom, listUrlDom, listUrlRule, sort }, { method: 'update',
+  debug: true })
   },
   // 删除单个渠道
   deleteChannel(id) {
