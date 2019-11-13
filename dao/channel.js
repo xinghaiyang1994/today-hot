@@ -27,8 +27,7 @@ module.exports = {
   },
   // 修改单个渠道
   updateChannel({ id, name, domain, isOpen, isSpa, cookie, isUseUserAgent, charset, hotUrl, listSpecialMethod, listDom, listTitleDom, listUrlDom, listUrlRule, sort }) {
-    return Channel.forge({ id }).save({ name, domain, isOpen, isSpa, cookie, isUseUserAgent, charset, hotUrl, listSpecialMethod, listDom, listTitleDom, listUrlDom, listUrlRule, sort }, { method: 'update',
-  debug: true })
+    return Channel.forge({ id }).save({ name, domain, isOpen, isSpa, cookie, isUseUserAgent, charset, hotUrl, listSpecialMethod, listDom, listTitleDom, listUrlDom, listUrlRule, sort }, { method: 'update'})
   },
   // 删除单个渠道
   deleteChannel(id) {

@@ -11,6 +11,7 @@ module.exports = function (app) {
   router.use('/suggest', require('./suggest').routes())
   router.use('/channel', require('./channel').routes())
   router.use('/user', require('./user').routes())
+  router.use('/config', require('./config').routes())
 
   app.use(router.routes())
   app.use(router.allowedMethods())
