@@ -14,10 +14,6 @@ module.exports = {
   deleteListAll() {
     return db.knex('list').truncate()
   },
-  // 删除单个渠道下的所有列表
-  deleteListByChannelId(channelId) {
-    return List.forge().where({'channel_id': channelId}).destroy({require: false})
-  },
   // 删除指定列表
   deleteListList(channelList) {
     return List.forge().where('channel_id', 'in', channelList).destroy({require: false})

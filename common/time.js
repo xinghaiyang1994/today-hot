@@ -12,7 +12,7 @@ const crawler = require('./crawler')
 
 // // 每个小时抓取更新所有列表
 // schedule.scheduleJob('0 10,20,30,40,50 * * * *', async () => {
-//   let { message } = await crawler.refetchFailData()
+//   let { message } = await crawler.fetchFailData()
 //   let log = '失败列表重新抓取：' + message
 //   console.log(log)
 // })

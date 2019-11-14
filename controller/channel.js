@@ -121,21 +121,21 @@ module.exports = {
   // 多个渠道重新抓取
   async postMutiUpdate(ctx) {
     const { type, list } = ctx.request.body
-    if (type === 'muti') {
-      console.log(list)
 
+    // 多个渠道
+    if (type === 'muti') {
       const { isTrue, message } = await crawler.fetchArrayData(list)
 
-      // console.log('所有结果', isTrue)
-      console.log(list)
       return ctx.body = dealBody({
         code: isTrue ? 0 : -1,
         message
       })
     }
 
+    // 所有渠道
     if (type === 'all') {
       const { isTrue, message } = await crawler.fetchAllData()
+
       return ctx.body = dealBody({
         code: isTrue ? 0 : -1,
         message

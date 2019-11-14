@@ -7,11 +7,11 @@ module.exports = function (app) {
   router.get('/', require('../controller/index').getIndex)
 
   // 子路由
-  router.use('/list', require('./list').routes())
   router.use('/suggest', require('./suggest').routes())
   router.use('/channel', require('./channel').routes())
   router.use('/user', require('./user').routes())
   router.use('/config', require('./config').routes())
+  router.use('/fail', require('./fail').routes())
 
   app.use(router.routes())
   app.use(router.allowedMethods())

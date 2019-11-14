@@ -11,7 +11,7 @@ module.exports = {
   },
   // 获取渠道列表(翻页)
   findChannelPage({ page, pageSize }) {
-    return Channel.forge().fetchPage({ page, pageSize })
+    return Channel.forge().orderBy('sort', 'DESC').fetchPage({ page, pageSize })
   },
   // 获取渠道总数
   findChannelCount() {

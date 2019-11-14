@@ -14,21 +14,22 @@ const debugCrawler = debug('crawler')
 
 const {
   findChannelAll,
-  findChannelDetailById,
   findOpenChannelListInArray
 }  = require('../dao/channel')
 const {
   insertList,
   deleteListAll,
-  deleteListByChannelId,
   deleteListList
 }  = require('../dao/list')
 const {
   insertChannelFail,
   deleteChannelFailByChannelIdList,
   findCountGtTimesGroupByChannelId,
-  findCountGroupByChannelId
+  findAllGroupByChannelId
 }  = require('../dao/channel_fail')
+const {
+  findValueByKey
+}  = require('../dao/config')
 
 let startTime   // 统计抓取耗时
 
@@ -91,7 +92,7 @@ async function htmlToList (info, resHtml) {
   }
 
   if (originList.length === 0) {
-    throw new Error('未抓取数据！')
+    throw new Error('未抓取数据!')
   }
   let list = originList.map(({ title, domOriginUrl }, index) => {
     return {
@@ -269,10 +270,17 @@ async function dealFetchArr(arrFetch = []) {
   // 失败
   await insertChannelFail(arrFail.map(el => ({ channelId: el.id })))
 
-  // 正式环境下统计大于三次抓取失败的发邮件
-  const failTimes = 3
-  let res = await findCountGtTimesGroupByChannelId(failTimes, arrFetch.map(el => el.id))
-  let arrNeedEmail = res.toJSON()
+  // 正式环境下统计符合条件抓取失败的发邮件
+  const daoMin = await findValueByKey('minCountSend')
+  const daoMax = await findValueByKey('maxCountSend')
+  const min = daoMin.toJSON().value   // 最小次数
+  const max = daoMax.toJSON().value   // 最大次数
+  const res = await findCountGtTimesGroupByChannelId({
+    list: arrFetch.map(el => el.id),
+    min,
+    max
+  })
+  const arrNeedEmail = res.toJSON()
 
   if (arrNeedEmail.length === 0) {
     return
@@ -296,95 +304,84 @@ async function dealFetchArr(arrFetch = []) {
   })
 }
 
+// 插入新列表及生成信息
+async function commonInsertAndInfo(list, startTime) {
+  let isTrue = await dealAllChannel(list)
+  const message = isTrue ? `抓取成功，耗时 ${Date.now() - startTime} ms` : '抓取失败!'
+  return {
+    isTrue,
+    message
+  }
+}
+
 module.exports = {
-  // 抓取数据
+  // 抓取所有渠道
   async fetchAllData() {
     startTime = Date.now()
 
+    // 获取所有渠道
     let result = await findChannelAll()
     let list = result.toJSON()
 
-    // 删除所有列表
+    // 删除所有原列表
     await deleteListAll()
    
-    // 抓取插入新列表
-    let isTrue = await dealAllChannel(list)
-
-    // 信息
-    const message = isTrue ? `抓取成功，耗时 ${Date.now() - startTime} ms` : '抓取失败！'
+    // 插入新列表及生成信息
+    const { isTrue, message } = await commonInsertAndInfo(list, startTime)
 
     return {
       isTrue,
       message
     }
   },
+  // 抓取部分渠道
   async fetchArrayData(channelList = []) {
     startTime = Date.now()
 
+    // 获取部分渠道
     let result = await findOpenChannelListInArray(channelList)
     let list = result.toJSON()
-    // console.log(list)
+
+    // 校验
     if (list.length === 0) {
       return {
-        isTrue: true,
-        message: '请最少选择一个开启的渠道！'
+        isTrue: false,
+        message: '请最少选择一个开启的渠道!'
       }
     }
 
-    // 删除指定列表
+    // 删除部分原列表
     await deleteListList(list.map(el => el.id))
    
-    // 抓取插入新列表
-    let isTrue = await dealAllChannel(list)
-
-    // 信息
-    const message = isTrue ? `抓取成功，耗时 ${Date.now() - startTime} ms` : '抓取失败！'
-
-    return {
-      isTrue: true,
-      message
-    }
-  },
-  async fetchSingleData(channelId) {
-    startTime = Date.now()
-
-    // 获取单个渠道详情
-    let resDetail = await findChannelDetailById(channelId)
-    if (!resDetail) {
-      throw new Error('不存在该渠道！')
-    }
-    let detail = resDetail.toJSON()
-
-    // 删除单个渠道下的所有列表
-    await deleteListByChannelId(channelId)
-    
-    // 抓取插入新列表
-    let isTrue = await dealAllChannel([detail])
-
-    // 信息
-    const message = isTrue ? `抓取成功，耗时 ${Date.now() - startTime} ms` : '抓取失败！'
+    // 插入新列表及生成信息
+    const { isTrue, message } = await commonInsertAndInfo(list, startTime)
 
     return {
       isTrue,
       message
     }
   },
-  async refetchFailData() {
+  // 抓取所有失败渠道
+  async fetchFailData() {
     startTime = Date.now()
-    let isTrue = true
-    let message
 
-    // 获取抓取失败的渠道
-    let res = await findCountGroupByChannelId()
-    let arrNeedFetch = res.toJSON()
+    // 获取失败的所有渠道
+    let result = await findAllGroupByChannelId()
+    let list = result.toJSON()
 
-    // 重新抓取
-    if (arrNeedFetch.length > 0) {
-      isTrue = await dealAllChannel(arrNeedFetch)
-      message = isTrue ? `重新抓取成功，耗时 ${Date.now() - startTime} ms` : '重新抓取失败'
-    } else {
-      message = '暂无失败请求'
+    // 校验
+    if (list.length === 0) {
+      return {
+        isTrue: false,
+        message: '暂无失败请求!'
+      }
     }
+
+    // 删除部分原列表
+    await deleteListList(list.map(el => el.id))
+
+    // 插入新列表及生成信息
+    const { isTrue, message } = await commonInsertAndInfo(list, startTime)
 
     return {
       isTrue,
