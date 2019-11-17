@@ -100,7 +100,7 @@ module.exports = {
   // 单个渠道开启与关闭
   async postOpenCtrl(ctx) {
     const { id, isOpen } = ctx.request.body
-    // TODO 是否需要验证 id 在列表中，及下面会不会报错
+    
     const resDao = await updateChannelOpenCtrl({ id, isOpen })
     const res = resDao.toJSON()
 
