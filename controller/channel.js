@@ -59,7 +59,7 @@ module.exports = {
     if (sort === '') {
       sort = 1
     }
-    console.log(ctx.request.body) 
+    // console.log(ctx.request.body) 
 
     const detailDao = await addChannel({ name, domain, isOpen, isSpa, cookie, isUseUserAgent, charset, hotUrl, listSpecialMethod, listDom, listTitleDom, listUrlDom, listUrlRule, sort })
     const detail = detailDao.toJSON()

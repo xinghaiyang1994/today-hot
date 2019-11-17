@@ -4,7 +4,8 @@ const { checkAdmin } = require('../middlewares/check')
 module.exports = {
   // 登录用户信息
   async getInfo(ctx) {
-    console.log(ctx.session)
+    // console.log(ctx.session)
+    
     // 检查是否是管理员
     const { status, data } = checkAdmin(ctx)
     if (!status) {
