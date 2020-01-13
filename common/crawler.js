@@ -285,7 +285,7 @@ async function dealFetchArr(arrFetch = []) {
   if (arrNeedEmail.length === 0) {
     return
   }
-  let content = `抓取失败大于 ${failTimes} 次渠道名称：`
+  let content = `抓取失败大于 ${min} 次渠道名称：`
   arrNeedEmail.forEach((el, index) => {
     content += el.name
     if (index !== arrNeedEmail.length - 1) {
@@ -294,11 +294,11 @@ async function dealFetchArr(arrFetch = []) {
   })
   
   // 正式环境发送邮件
-  if (env === 'local') {
+  if (env === 'dev') {
     return console.log(content)
   }
   email.send({
-    name: `抓取失败大于 ${failTimes} 次`,
+    name: `抓取失败大于 ${min} 次`,
     subject: '爬虫抓取失败',
     html: `${(new Date()).toLocaleString()} | ${content}`
   })
